@@ -4,24 +4,29 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-6xl px-6">
-
         {/* NAVBAR */}
         <header className="flex items-center justify-between py-6">
           <div className="flex items-center gap-3">
             <Image
               src="/brand/stablebill-logo.png"
               alt="StableBill"
-              width={220}
-              height={90}
+              width={260}
+              height={110}
               priority
-              className="h-10 w-auto"
+              className="h-14 w-auto"
             />
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="#pricing" className="hover:text-white">Pricing</a>
-            <a href="#faq" className="hover:text-white">FAQ</a>
+            <a href="#features" className="hover:text-white">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-white">
+              Pricing
+            </a>
+            <a href="#faq" className="hover:text-white">
+              FAQ
+            </a>
           </nav>
 
           <a
@@ -58,16 +63,20 @@ export default function Home() {
               </a>
             </div>
 
+            {/* Credibility line */}
+            <p className="text-xs text-white/40">
+              Non-custodial • Stablecoin-native • No volatility
+            </p>
+
             <p className="text-xs text-white/50">
               Built for founders, finance teams, and Web3-native businesses.
             </p>
           </div>
 
           {/* LOGO CARD */}
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-            <div className="text-sm text-white/60 mb-4">
-              Brand preview
-            </div>
+          <div className="rounded-3xl border border-white/10 bg-white/3 p-6">
+            <div className="text-sm text-white/60 mb-4">Brand preview</div>
+
             <div className="rounded-2xl bg-black/60 p-6 border border-white/10">
               <Image
                 src="/brand/stablebill-logo.png"
@@ -110,12 +119,17 @@ export default function Home() {
         <footer className="mt-32 border-t border-white/10 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/50">
           <div>© {new Date().getFullYear()} StableBill</div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white">Privacy</a>
-            <a href="#" className="hover:text-white">Terms</a>
-            <a href="#" className="hover:text-white">Contact</a>
+            <a href="#" className="hover:text-white">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-white">
+              Terms
+            </a>
+            <a href="#" className="hover:text-white">
+              Contact
+            </a>
           </div>
         </footer>
-
       </div>
     </main>
   );
