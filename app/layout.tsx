@@ -1,3 +1,4 @@
+import "./globals.css";
 export const metadata = {
   title: "StableBill — Stablecoin Invoicing Made Simple",
   description:
