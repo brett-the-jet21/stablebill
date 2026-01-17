@@ -6,15 +6,18 @@ export default function Home() {
       <div className="mx-auto max-w-6xl px-6">
         {/* NAVBAR */}
         <header className="flex items-center justify-between py-6">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/brand/stablebill-logo.png"
-              alt="StableBill"
-              width={260}
-              height={110}
-              priority
-              className="h-14 w-auto"
-            />
+          {/* Cropped/zoomed logo */}
+          <div className="flex items-center">
+            <div className="h-10 w-44 overflow-hidden rounded-lg border border-white/10 bg-black">
+              <Image
+                src="/brand/stablebill-logo.png"
+                alt="StableBill"
+                width={900}
+                height={450}
+                priority
+                className="h-20 w-auto -translate-y-6 -translate-x-6 scale-125"
+              />
+            </div>
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
@@ -73,7 +76,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* LOGO CARD */}
+          {/* LOGO CARD (lighter) */}
           <div className="rounded-3xl border border-white/10 bg-white/3 p-6">
             <div className="text-sm text-white/60 mb-4">Brand preview</div>
 
