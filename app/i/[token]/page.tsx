@@ -32,7 +32,7 @@ export default function PublicInvoicePage({ params }: { params: { token: string 
       const res = await fetch(`/api/invoice-by-token/${params.token}`, { cache: "no-store" });
       const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Failed to load");
-      setInvoice(data.invoice);
+      setInvoice(((data as any)?.invoice ?? null));
     } catch (e: any) {
       setErr(e?.message || "Failed to load invoice");
     }

@@ -38,7 +38,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch("/api/invoices", { cache: "no-store" });
       const data = await safeJson(res);
-      setInvoices(data.invoices || []);
+      setInvoices(((data as any)?.invoices ?? []) || []);
     } catch (e: any) {
       setErr(e?.message || "Failed to load invoices");
     } finally {
