@@ -1,5 +1,7 @@
 "use client";
 
+import { safeJson } from "../lib/safeJson";
+
 import { useEffect, useMemo, useState } from "react";
 
 type Invoice = {
@@ -35,7 +37,7 @@ export default function DashboardPage() {
     setErr(null);
     try {
       const res = await fetch("/api/invoices", { cache: "no-store" });
-      const data = await res.json();
+      const data = await safeJson(res);
       setInvoices(data.invoices || []);
     } catch (e: any) {
       setErr(e?.message || "Failed to load invoices");
@@ -69,7 +71,7 @@ export default function DashboardPage() {
           amount: amount,
         }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Failed to create invoice");
 
       setCustomerName("");

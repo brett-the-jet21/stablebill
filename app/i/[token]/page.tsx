@@ -1,5 +1,7 @@
 "use client";
 
+import { safeJson } from "../../lib/safeJson";
+
 import { useEffect, useState } from "react";
 
 type Invoice = {
@@ -28,7 +30,7 @@ export default function PublicInvoicePage({ params }: { params: { token: string 
   async function load() {
     try {
       const res = await fetch(`/api/invoice-by-token/${params.token}`, { cache: "no-store" });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Failed to load");
       setInvoice(data.invoice);
     } catch (e: any) {
@@ -51,7 +53,7 @@ export default function PublicInvoicePage({ params }: { params: { token: string 
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ token: invoice.token }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Failed to start checkout");
       window.location.href = data.url;
     } catch (e: any) {
@@ -70,7 +72,7 @@ export default function PublicInvoicePage({ params }: { params: { token: string 
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ token: invoice.token }),
       });
-      const data = await res.json();
+      const data = await safeJson(res);
       if (!res.ok) throw new Error(data?.error || "Failed to start USDC checkout");
       window.location.href = data.hostedUrl;
     } catch (e: any) {
