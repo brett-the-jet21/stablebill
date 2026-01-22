@@ -46,10 +46,6 @@ model Invoice {
   paidAt      DateTime?
 
   payments    Payment[]
-  paymentProvider String?  // STRIPE | COINBASE
-  cryptoChargeId  String?  
-  cryptoHostedUrl String?
-  paidCurrency    String?  // e.g. USDC
 }
 
 model Payment {
