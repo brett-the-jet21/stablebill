@@ -1,6 +1,5 @@
 /**
- * TEMP SAFE STUB:
- * This prevents build failures while DB setup is unfinished.
- * When you're ready, replace with real PrismaClient wiring.
+ * TEMP SAFE STUB so builds pass before DB is wired.
+ * Replace with real PrismaClient later.
  */
 export const prisma: any = null;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { prisma } from "@/lib/prisma";
-import { Webhook, initCoinbase } from "@/lib/coinbase";
+import { prisma } from "../../../lib/prisma";
+import { Webhook, initCoinbase } from "../../../lib/coinbase";
 
 export const runtime = "nodejs";
 

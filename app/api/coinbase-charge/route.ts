@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { Charge, initCoinbase } from "@/lib/coinbase";
+import { prisma } from "../../../lib/prisma";
+import { Charge, initCoinbase } from "../../../lib/coinbase";
 
 export const runtime = "nodejs";
 
