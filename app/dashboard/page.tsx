@@ -1,5 +1,19 @@
 "use client";
 
+function normalizeAmount(inv: any): number {
+  const a = Number(inv?.amount);
+  if (Number.isFinite(a) && a > 0) return a;
+
+  const b = Number(inv?.amountUsd);
+  if (Number.isFinite(b) && b > 0) return b;
+
+  const c = Number(inv?.amount_cents ?? inv?.amountCents);
+  if (Number.isFinite(c) && c > 0) return c / 100;
+
+  return 0;
+}
+
+
 import { safeJson } from "../lib/safeJson";
 
 import { useEffect, useMemo, useState } from "react";
@@ -53,7 +67,7 @@ export default function DashboardPage() {
   const totalOutstanding = useMemo(() => {
     return invoices
       .filter((i) => i.status !== "PAID")
-      .reduce((sum, i) => sum + i.amountCents, 0);
+      .reduce((sum, i) => sum + normalizeAmount(i), 0);
   }, [invoices]);
 
   async function createInvoice(e: React.FormEvent) {
@@ -154,7 +168,7 @@ export default function DashboardPage() {
                 <div style={{ fontWeight: 600 }}>{inv.customerName}</div>
                 {inv.customerEmail ? <div style={{ opacity: 0.75, fontSize: 13 }}>{inv.customerEmail}</div> : null}
               </div>
-              <div style={{ fontWeight: 700 }}>{money(inv.amountCents)}</div>
+              <div style={{ fontWeight: 700 }}>{moneyUSD(normalizeAmount(inv))}</div>
               <div>
                 <a href={`/i/${inv.token}`} target="_blank" rel="noreferrer">Open</a>
               </div>
