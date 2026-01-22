@@ -1,7 +1,13 @@
 node_modules/
 .next/
 out/
-.env*
+
+# env (ignore real secrets only)
+.env
+.env.local
+
+# OS junk
 .DS_Store
 
-/app/generated/prisma
+# Prisma generated (old path, safe to ignore)
+app/generated/prisma
