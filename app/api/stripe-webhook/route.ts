@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { stripe } from "@/lib/stripe";
-import { prisma } from "@/lib/prisma";
+import { getStripe } from "../../../lib/stripe";
+import { prisma } from "../../../lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, whsec);
+    event = getStripe().webhooks.constructEvent(body, sig, whsec);
   } catch (err: any) {
     return NextResponse.json({ error: `Webhook signature verify failed: ${err.message}` }, { status: 400 });
   }
