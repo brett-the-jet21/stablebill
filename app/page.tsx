@@ -1,139 +1,122 @@
-import Image from "next/image";
+import Link from "next/link";
+import Header from "./components/Header";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white relative z-10">
-      <div className="mx-auto max-w-6xl px-6">
-        {/* NAVBAR */}
-        <header className="flex items-center justify-between py-6">
-          {/* Cropped/zoomed logo */}
-          <div className="flex items-center">
-            <div className="h-10 w-44 overflow-hidden rounded-lg border border-white/10 bg-black">
-              <Image
-                src="/brand/stablebill-logo.png"
-                alt="StableBill"
-                width={900}
-                height={450}
-                priority
-                className="h-20 w-auto -translate-y-6 -translate-x-6 scale-125"
-              />
-            </div>
-          </div>
+    <main className="min-h-screen bg-black text-white">
+      <Header />
 
-          <nav className="hidden md:flex items-center gap-6 text-sm text-white/70">
-            <a href="#features" className="hover:text-white">
-              Features
-            </a>
-            <a href="#pricing" className="hover:text-white">
-              Pricing
-            </a>
-            <a href="#faq" className="hover:text-white">
-              FAQ
-            </a>
-          </nav>
+      {/* HERO */}
+      <section className="px-6 pt-20 pb-16 max-w-6xl mx-auto">
+        <h1 className="text-5xl font-bold leading-tight">
+          Stablecoin invoicing<br />that feels instant.
+        </h1>
+
+        <p className="mt-6 text-lg text-white/70 max-w-xl">
+          Create invoices. Get paid in stablecoins. Reconcile in seconds.
+        </p>
+
+        <div className="mt-10 flex gap-4">
+          <Link
+            href="/signup"
+            className="rounded-xl bg-white px-6 py-3 font-semibold text-black hover:opacity-90"
+          >
+            Start Free
+          </Link>
 
           <a
-            href="#"
-            className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+            href="#features"
+            className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-blue-500 hover:bg-white/5"
           >
-            Get Started
+            See Features
           </a>
-        </header>
+        </div>
 
-        {/* HERO */}
-        <section className="mt-20 grid gap-14 md:grid-cols-2 md:items-center">
-          <div className="space-y-6">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight">
-              Stablecoin invoicing that feels instant.
-            </h1>
+        <p className="mt-6 text-sm text-white/40">
+          Non-custodial · Stablecoin-native · No volatility
+        </p>
+      </section>
 
-            <p className="text-lg sm:text-xl text-white/70 max-w-xl">
-              Create invoices. Get paid in stablecoins. Reconcile in seconds.
-            </p>
+      {/* FEATURES */}
+      <section id="features" className="px-6 py-20 border-t border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold">Features</h2>
+          <p className="mt-2 text-white/60">
+            Everything you need to invoice in USD and settle in stablecoins.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="#"
-                className="inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold bg-white text-black hover:opacity-90"
-              >
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 p-6">
+              Invoice links + PDFs
+            </div>
+            <div className="rounded-2xl border border-white/10 p-6">
+              Stablecoin payment tracking
+            </div>
+            <div className="rounded-2xl border border-white/10 p-6">
+              Automatic reconciliation
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section id="pricing" className="px-6 py-20 border-t border-white/10">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-semibold">Pricing</h2>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <div className="rounded-2xl border border-white/10 p-6">
+              <div className="text-xl font-semibold">Starter</div>
+              <div className="mt-3 text-4xl font-bold">$0</div>
+              <p className="mt-2 text-white/60">Basic invoicing</p>
+              <Link href="/signup" className="mt-6 inline-block bg-white text-black px-5 py-2 rounded-xl font-semibold">
                 Start Free
-              </a>
-              <a
-                href="#features"
-                className="inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold border border-white/20 hover:border-white/40"
-              >
-                See Features
-              </a>
+              </Link>
             </div>
 
-            {/* Credibility line */}
-            <p className="text-xs text-white/40">
-              Non-custodial • Stablecoin-native • No volatility
-            </p>
+            <div className="rounded-2xl border border-white/10 p-6">
+              <div className="text-xl font-semibold">Pro</div>
+              <div className="mt-3 text-4xl font-bold">$29</div>
+              <p className="mt-2 text-white/60">Reconciliation + exports</p>
+              <Link href="/signup" className="mt-6 inline-block bg-white text-black px-5 py-2 rounded-xl font-semibold">
+                Get Pro
+              </Link>
+            </div>
 
-            <p className="text-xs text-white/50">
-              Built for founders, finance teams, and Web3-native businesses.
-            </p>
-          </div>
-
-          {/* LOGO CARD (lighter) */}
-          <div className="rounded-3xl border border-white/10 bg-white/3 p-6">
-            <div className="text-sm text-white/60 mb-4">Brand preview</div>
-
-            <div className="rounded-2xl bg-black/60 p-6 border border-white/10">
-              <Image
-                src="/brand/stablebill-logo.png"
-                alt="StableBill Logo"
-                width={900}
-                height={450}
-                className="w-full h-auto"
-              />
+            <div className="rounded-2xl border border-white/10 p-6">
+              <div className="text-xl font-semibold">Business</div>
+              <div className="mt-3 text-4xl font-bold">$99</div>
+              <p className="mt-2 text-white/60">API + advanced controls</p>
+              <Link href="/signup" className="mt-6 inline-block bg-white text-black px-5 py-2 rounded-xl font-semibold">
+                Talk to Sales
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FEATURES */}
-        <section id="features" className="mt-28 grid gap-6 md:grid-cols-3">
-          {[
-            {
-              title: "Invoice in seconds",
-              desc: "Generate invoices with stablecoin payment links instantly.",
-            },
-            {
-              title: "Global settlement",
-              desc: "Accept USDC & USDT worldwide without banking friction.",
-            },
-            {
-              title: "Clean reconciliation",
-              desc: "Export records your accountant will actually like.",
-            },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6"
-            >
-              <h3 className="font-semibold text-lg">{item.title}</h3>
-              <p className="mt-2 text-sm text-white/70">{item.desc}</p>
+      {/* FAQ */}
+      <section id="faq" className="px-6 py-20 border-t border-white/10">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-semibold">FAQ</h2>
+
+          <div className="mt-8 space-y-4">
+            <div className="rounded-2xl border border-white/10 p-6">
+              <strong>Do you custody funds?</strong>
+              <p className="mt-2 text-white/60">
+                No. StableBill is fully non-custodial.
+              </p>
             </div>
-          ))}
-        </section>
 
-        {/* FOOTER */}
-        <footer className="mt-32 border-t border-white/10 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/50">
-          <div>© {new Date().getFullYear()} StableBill</div>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-white">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white">
-              Terms
-            </a>
-            <a href="#" className="hover:text-white">
-              Contact
-            </a>
+            <div className="rounded-2xl border border-white/10 p-6">
+              <strong>Can I invoice in USD?</strong>
+              <p className="mt-2 text-white/60">
+                Yes — invoices are USD, settlement is stablecoin.
+              </p>
+            </div>
           </div>
-        </footer>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
