@@ -15,6 +15,7 @@ function normalizeAmount(inv: any): number {
 
 
 import { safeJson } from "../lib/safeJson";
+import { moneyUSD } from "../lib/money";
 
 import { useEffect, useMemo, useState } from "react";
 
