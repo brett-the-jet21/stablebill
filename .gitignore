@@ -11,3 +11,5 @@ out/
 
 # Prisma generated (old path, safe to ignore)
 app/generated/prisma
+.vercel
+.env*.local
