@@ -1,11 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ["error", "warn"],
-  });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+/**
+ * TEMP SAFE STUB:
+ * This prevents build failures while DB setup is unfinished.
+ * When you're ready, replace with real PrismaClient wiring.
+ */
+export const prisma: any = null;

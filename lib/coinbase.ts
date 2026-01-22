@@ -1,7 +1,8 @@
-import Coinbase from "coinbase-commerce-node";
+import Client from "coinbase-commerce-node";
 
-const apiKey = process.env.COINBASE_COMMERCE_API_KEY || "";
-Coinbase.Client.init(apiKey);
-
-export const Charge = Coinbase.resources.Charge;
-export const Webhook = Coinbase.Webhook;
+export function initCoinbase() {
+  const apiKey = process.env.COINBASE_COMMERCE_API_KEY;
+  if (!apiKey) throw new Error("Missing COINBASE_COMMERCE_API_KEY");
+  Client.Client.init(apiKey);
+  return Client;
+}
