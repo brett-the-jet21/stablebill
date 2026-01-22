@@ -3,11 +3,27 @@ import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
+  // Guard: Stripe env not configured
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: "Stripe is not configured (missing STRIPE_SECRET_KEY)" },
+      { status: 503 }
+    );
+  }
+
+  // Guard: DB not configured (prisma stub or not wired yet)
+  if (!prisma || !(prisma as any).invoice) {
+    return NextResponse.json(
+      { error: "Database not configured (Prisma not initialized)" },
+      { status: 503 }
+    );
+  }
+
   const body = await req.json();
   const token = String(body.token || "").trim();
   if (!token) return NextResponse.json({ error: "token required" }, { status: 400 });
 
-  const invoice = await prisma.invoice.findUnique({ where: { token } });
+  const invoice = await (prisma as any).invoice.findUnique({ where: { token } });
   if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
   if (invoice.status === "PAID") return NextResponse.json({ error: "Already paid" }, { status: 400 });
 
@@ -32,8 +48,8 @@ export async function POST(req: Request) {
     success_url: `${origin}/i/${invoice.token}?success=1`,
     cancel_url: `${origin}/i/${invoice.token}?canceled=1`,
     metadata: {
-      invoiceId: invoice.id,
-      invoiceToken: invoice.token,
+      invoiceId: String(invoice.id),
+      invoiceToken: String(invoice.token),
     },
   });
 
