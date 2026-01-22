@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-black text-white relative z-10">
       <div className="mx-auto max-w-6xl px-6">
         {/* NAVBAR */}
         <header className="flex items-center justify-between py-6">
