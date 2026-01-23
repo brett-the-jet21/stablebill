@@ -1,77 +1,79 @@
-import Link from 'next/link'
-
-export const metadata = {
-  title: 'StableBill — Global Stablecoin Invoicing & Instant Settlement',
-  description: 'Professional stablecoin invoicing for Web3 teams. Get paid in USDC/USDT instantly with non-custodial security. No banking delays.',
-}
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white">
-      <header className="w-full flex items-center justify-between px-6 py-5 border-b border-white/10">
-        <Link className="font-semibold text-lg" href="/">StableBill</Link>
-        <nav className="hidden md:flex items-center gap-8 text-sm">
-          <a href="#features" className="text-blue-500 hover:opacity-80">Features</a>
-          <a href="#pricing" className="text-blue-500 hover:opacity-80">Pricing</a>
-          <a href="#faq" className="text-blue-500 hover:opacity-80">FAQ</a>
-        </nav>
-        <Link className="rounded-xl bg-white px-5 py-2 font-semibold text-black hover:opacity-90" href="/signup">
-          Get Started
-        </Link>
-      </header>
-
-      <section className="px-6 pt-20 pb-16 max-w-6xl mx-auto">
-        <h1 className="text-6xl font-bold leading-tight tracking-tighter">
-          Stablecoin invoicing<br/>that feels instant.
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Hero */}
+      <section className="pt-20 pb-16 px-6 md:px-12 lg:px-24 text-center">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight">
+          Global Stablecoin Invoicing
+          <br />
+          <span className="text-indigo-600">Instant • Stable • Simple</span>
         </h1>
-        <p className="mt-6 text-xl text-white/70 max-w-xl">
-          The non-custodial standard for B2B crypto payments. Get paid in USDC and settle in seconds, not days.
+        <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
+          Send invoices in USDC across Solana, Ethereum, Polygon & Base. Get paid instantly with zero volatility. No wallet needed to start.
         </p>
-        <div className="mt-10 flex gap-4">
-          <Link className="rounded-xl bg-white px-8 py-4 font-bold text-black hover:scale-105 transition-transform" href="/signup">
-            Get Your First Invoice Paid
+
+        <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
+          <motion.button
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}
+            whileTap={{ scale: 0.98 }}
+            className="px-10 py-5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold text-xl rounded-2xl shadow-xl focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300"
+            onClick={() => window.location.href = '/signup'}
+          >
+            Start Free – No Wallet Required
+          </motion.button>
+
+          <Link
+            href="/signup"
+            className="px-10 py-5 border-2 border-indigo-500 text-indigo-600 font-bold text-xl rounded-2xl hover:bg-indigo-50 hover:border-indigo-600 transition-all duration-300"
+          >
+            Get Pro Plan
           </Link>
-          <a href="#features" className="rounded-xl border border-white/15 px-8 py-4 font-semibold text-blue-500 hover:bg-white/5">
-            View Demo
-          </a>
+        </div>
+
+        {/* Networks / Trust */}
+        <div className="mt-16 flex flex-wrap justify-center gap-8 opacity-80">
+          <span className="text-lg font-medium text-gray-700">Powered by Solana • Ethereum • Polygon • Base</span>
         </div>
       </section>
 
-      <div className="w-full border-y border-white/5 bg-white/[0.01] py-10">
-        <div className="max-w-6xl mx-auto px-6">
-          <p className="text-center text-[10px] uppercase tracking-[0.3em] text-white/30 mb-8 font-bold">
-            Settling on the most trusted networks
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-12 opacity-30 grayscale">
-             <span className="text-2xl font-black">SOLANA</span>
-             <span className="text-2xl font-black">ETHEREUM</span>
-             <span className="text-2xl font-black">POLYGON</span>
-             <span className="text-2xl font-black">BASE</span>
-             <span className="text-2xl font-black">USDC</span>
+      {/* Pricing placeholder - expand later */}
+      <section className="py-20 px-6 bg-white">
+        <h2 className="text-4xl font-bold text-center mb-12">Simple, Transparent Pricing</h2>
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* Starter Card */}
+          <div className="p-8 border rounded-2xl shadow-lg hover:shadow-2xl transition">
+            <h3 className="text-2xl font-bold">Starter</h3>
+            <p className="text-4xl font-extrabold mt-4">$0<span className="text-xl font-normal"> /mo</span></p>
+            <p className="text-gray-600 mt-2">Up to $5,000 monthly volume</p>
+            <ul className="mt-6 space-y-3">
+              <li>✓ Basic invoicing</li>
+              <li>✓ Multi-chain support</li>
+            </ul>
+            <button className="mt-8 w-full py-4 bg-gray-800 text-white font-semibold rounded-xl hover:bg-gray-900 transition">
+              Choose Starter
+            </button>
           </div>
-        </div>
-      </div>
 
-      <section id="features" className="px-6 py-24">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl font-bold">Simple, Volume-Based Pricing</h2>
-          <div className="mt-16 grid gap-8 md:grid-cols-3 text-left">
-            <div className="rounded-3xl border border-white/10 p-8">
-              <div className="text-lg font-medium text-white/50">Starter</div>
-              <div className="mt-4 text-5xl font-bold">$0</div>
-              <p className="mt-4 text-white/60 mb-8">Up to $5k/mo in volume. Basic reporting.</p>
-              <Link className="w-full block text-center bg-white/10 text-white px-5 py-3 rounded-xl font-semibold" href="/signup">Start Free</Link>
-            </div>
-            <div className="rounded-3xl border-2 border-blue-500 p-8 relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-xs font-bold px-3 py-1 rounded-full uppercase">Most Popular</div>
-              <div className="text-lg font-medium text-white/50">Pro</div>
-              <div className="mt-4 text-5xl font-bold">$29</div>
-              <p className="mt-4 text-white/60 mb-8">Unlimited volume + QuickBooks sync.</p>
-              <Link className="w-full block text-center bg-blue-500 text-white px-5 py-3 rounded-xl font-semibold" href="/signup">Get Pro</Link>
-            </div>
+          {/* Pro Card */}
+          <div className="p-8 border-2 border-indigo-500 rounded-2xl shadow-2xl relative">
+            <span className="absolute -top-3 right-6 bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold">Most Popular</span>
+            <h3 className="text-2xl font-bold">Pro</h3>
+            <p className="text-4xl font-extrabold mt-4">$29<span className="text-xl font-normal"> /mo</span></p>
+            <p className="text-gray-600 mt-2">Unlimited volume + integrations</p>
+            <ul className="mt-6 space-y-3">
+              <li>✓ QuickBooks sync</li>
+              <li>✓ Priority support</li>
+              <li>✓ Advanced analytics</li>
+            </ul>
+            <button className="mt-8 w-full py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition">
+              Get Pro
+            </button>
           </div>
         </div>
       </section>
     </main>
-  )
+  );
 }
