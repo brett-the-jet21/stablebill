@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useEffect, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (done) router.replace("/onboarding");
+  }, [done, router]);
 
   function submit(e: FormEvent) {
     e.preventDefault();
@@ -16,14 +22,13 @@ export default function SignupPage() {
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-6">
       <div className="w-full max-w-md rounded-2xl border border-white/10 p-8">
         <h1 className="text-3xl font-semibold">Create your workspace</h1>
-        <p className="mt-2 text-white/60">
-          No wallet required to start.
-        </p>
+        <p className="mt-2 text-white/60">No wallet required to start.</p>
 
         {done ? (
           <div className="mt-6 rounded-xl border border-white/10 p-4">
             <strong>You're in.</strong>
             <p className="mt-2 text-white/60 text-sm">{email}</p>
+            <p className="mt-3 text-white/50 text-sm">Redirecting…</p>
           </div>
         ) : (
           <form onSubmit={submit} className="mt-6 space-y-4">
@@ -35,7 +40,6 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-xl bg-black border border-white/10 px-4 py-3 outline-none"
             />
-
             <button className="w-full rounded-xl bg-white px-5 py-3 font-semibold text-black hover:opacity-90">
               Start free
             </button>

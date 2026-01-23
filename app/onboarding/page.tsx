@@ -23,7 +23,7 @@ export default function OnboardingPage() {
 
         <button
           onClick={() => router.replace("/dashboard")}
-          className="mt-6 w-full rounded-xl bg-white px-5 py-3 font-semibold text-black"
+          className="mt-6 w-full rounded-xl bg-white px-5 py-3 font-semibold text-black hover:opacity-90"
         >
           Go to dashboard
         </button>
