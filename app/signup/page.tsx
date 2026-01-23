@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault();
     localStorage.setItem("stablebill_email", email);
     setDone(true);
