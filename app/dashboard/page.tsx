@@ -1,22 +1,7 @@
 "use client";
 
-function normalizeAmount(inv: any): number {
-  const a = Number(inv?.amount);
-  if (Number.isFinite(a) && a > 0) return a;
-
-  const b = Number(inv?.amountUsd);
-  if (Number.isFinite(b) && b > 0) return b;
-
-  const c = Number(inv?.amount_cents ?? inv?.amountCents);
-  if (Number.isFinite(c) && c > 0) return c / 100;
-
-  return 0;
-}
-
-
-import { safeJson } from "../lib/safeJson";
-
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { safeJson } from "../lib/safeJson";
 
 type Invoice = {
   id: string;
@@ -25,14 +10,48 @@ type Invoice = {
   customerName: string;
   customerEmail?: string | null;
   memo?: string | null;
-  currency: string;
-  amountCents: number;
+  currency?: string | null;
+  chain?: string | null;
+  amountCents?: number | null;
+  amount_cents?: number | null;
+  amountCentsRaw?: number | null;
+  amount?: any;
+  amountUsd?: any;
   createdAt: string;
   paidAt?: string | null;
 };
 
-function money(cents: number) {
-  return (cents / 100).toLocaleString(undefined, { style: "currency", currency: "USD" });
+function normalizeAmountUSD(inv: any): number {
+  const a = Number(inv?.amount);
+  if (Number.isFinite(a) && a > 0) return a;
+
+  const b = Number(inv?.amountUsd);
+  if (Number.isFinite(b) && b > 0) return b;
+
+  const c = Number(inv?.amount_cents ?? inv?.amountCents ?? inv?.amountCentsRaw);
+  if (Number.isFinite(c) && c > 0) return c / 100;
+
+  return 0;
+}
+
+function fmtUSDC(n: number) {
+  const v = Number(n) || 0;
+  return v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(iso: string) {
+  try {
+    return new Date(iso).toLocaleString();
+  } catch {
+    return iso;
+  }
+}
+
+function statusPill(status: string) {
+  const s = (status || "").toUpperCase();
+  if (s === "PAID") return { label: "Paid", cls: "bg-emerald-500/15 text-emerald-200 border-emerald-400/30" };
+  if (s === "VOID") return { label: "Void", cls: "bg-zinc-500/15 text-zinc-200 border-white/10" };
+  return { label: "Unpaid", cls: "bg-amber-500/15 text-amber-200 border-amber-400/30" };
 }
 
 export default function DashboardPage() {
@@ -40,11 +59,16 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [memo, setMemo] = useState("");
   const [amount, setAmount] = useState("");
+
+  // Stablecoin-first defaults (UI-only; backend can ignore these safely)
+  const [currency, setCurrency] = useState<"USDC" | "USDT">("USDC");
+  const [chain, setChain] = useState<"Base" | "Ethereum" | "Solana">("Base");
 
   async function refresh() {
     setLoading(true);
@@ -64,10 +88,17 @@ export default function DashboardPage() {
     refresh();
   }, []);
 
-  const totalOutstanding = useMemo(() => {
+  // tiny toast auto-clear
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 1800);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const outstandingUSDC = useMemo(() => {
     return invoices
-      .filter((i) => i.status !== "PAID")
-      .reduce((sum, i) => sum + normalizeAmount(i), 0);
+      .filter((i) => (i.status || "").toUpperCase() !== "PAID")
+      .reduce((sum, i) => sum + normalizeAmountUSD(i), 0);
   }, [invoices]);
 
   async function createInvoice(e: FormEvent) {
@@ -82,16 +113,20 @@ export default function DashboardPage() {
           customerName,
           customerEmail: customerEmail || null,
           memo: memo || null,
-          amount: amount,
+          // backend expects amount string (USD) today; we display it as USDC for the stablecoin story
+          amount,
+          currency,
+          chain,
         }),
       });
       const data = await safeJson(res);
-      if (!res.ok) throw new Error(data?.error || "Failed to create invoice");
+      if (!res.ok) throw new Error((data as any)?.error || "Failed to create invoice");
 
       setCustomerName("");
       setCustomerEmail("");
       setMemo("");
       setAmount("");
+      setToast("Invoice created");
       await refresh();
     } catch (e: any) {
       setErr(e?.message || "Failed to create invoice");
@@ -100,102 +135,229 @@ export default function DashboardPage() {
     }
   }
 
+  async function copy(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setToast("Copied");
+    } catch {
+      setToast("Copy failed");
+    }
+  }
+
   return (
-    <main style={{ maxWidth: 1000, margin: "0 auto", padding: 24 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "baseline" }}>
-        <h1 style={{ margin: 0, fontSize: 28 }}>Stable Bill Dashboard</h1>
-        <div style={{ opacity: 0.85 }}>
-          Outstanding: <b>{money(totalOutstanding)}</b>
-        </div>
-      </div>
+    <main className="min-h-screen bg-black text-white">
+      <div className="mx-auto max-w-6xl px-6 py-8">
+        {/* Header */}
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              Stablecoin Billing • No chargebacks • Instant settlement
+            </div>
 
-      <section style={{ marginTop: 18, padding: 16, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14 }}>
-        <h2 style={{ marginTop: 0, fontSize: 18 }}>Create invoice</h2>
-
-        <form onSubmit={createInvoice} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Customer name</span>
-            <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Customer email (optional)</span>
-            <input value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Amount (USD)</span>
-            <input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" placeholder="e.g. 149.99" required />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Memo (optional)</span>
-            <input value={memo} onChange={(e) => setMemo(e.target.value)} />
-          </label>
-
-          <div style={{ gridColumn: "1 / -1", display: "flex", gap: 10, alignItems: "center" }}>
-            <button type="submit" disabled={creating}>
-              {creating ? "Creating..." : "Create invoice"}
-            </button>
-            {err ? <span style={{ color: "tomato" }}>{err}</span> : null}
-          </div>
-        </form>
-      </section>
-
-      <section style={{ marginTop: 18 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 18 }}>Invoices</h2>
-          <button onClick={refresh} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
-        </div>
-
-        <div style={{ marginTop: 10, border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "140px 1fr 160px 110px 220px", padding: "10px 12px", fontWeight: 600, opacity: 0.9, borderBottom: "1px solid rgba(255,255,255,0.10)" }}>
-            <div>Status</div>
-            <div>Customer</div>
-            <div>Amount</div>
-            <div>Link</div>
-            <div>Created</div>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight">Stable Bill Dashboard</h1>
+            <p className="mt-2 text-white/60">
+              Issue invoices payable in <span className="text-white">USDC</span> (default) — ship value, settle fast.
+            </p>
           </div>
 
-          {invoices.length === 0 && !loading ? (
-            <div style={{ padding: 14, opacity: 0.8 }}>No invoices yet.</div>
-          ) : null}
+          <div className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
+            <div className="text-xs text-white/60">Outstanding</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <div className="text-2xl font-semibold">{fmtUSDC(outstandingUSDC)}</div>
+              <div className="text-sm text-white/70">USDC</div>
+            </div>
+            <div className="mt-2 text-xs text-white/50">Estimated at 1 USDC ≈ $1</div>
+          </div>
+        </div>
 
-          {invoices.map((inv) => (
-            <div key={inv.id} style={{ display: "grid", gridTemplateColumns: "140px 1fr 160px 110px 220px", padding: "10px 12px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-              <div><b>{inv.status}</b></div>
-              <div>
-                <div style={{ fontWeight: 600 }}>{inv.customerName}</div>
-                {inv.customerEmail ? <div style={{ opacity: 0.75, fontSize: 13 }}>{inv.customerEmail}</div> : null}
+        {/* Create */}
+        <section className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Create invoice</h2>
+              <p className="mt-1 text-sm text-white/60">Customer pays via USDC. You get instant settlement.</p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2">
+                <span className="text-xs text-white/60">Stablecoin</span>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value as any)}
+                  className="bg-transparent text-sm outline-none"
+                >
+                  <option value="USDC">USDC</option>
+                  <option value="USDT" disabled>
+                    USDT (soon)
+                  </option>
+                </select>
               </div>
-              <div>
-                <a href={`/i/${inv.token}`} target="_blank" rel="noreferrer">Open</a>
-              </div>
-              <div style={{ opacity: 0.8 }}>
-                {new Date(inv.createdAt).toLocaleString()}
+
+              <div className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3 py-2">
+                <span className="text-xs text-white/60">Network</span>
+                <select
+                  value={chain}
+                  onChange={(e) => setChain(e.target.value as any)}
+                  className="bg-transparent text-sm outline-none"
+                >
+                  <option value="Base">Base</option>
+                  <option value="Ethereum" disabled>
+                    Ethereum (soon)
+                  </option>
+                  <option value="Solana" disabled>
+                    Solana (soon)
+                  </option>
+                </select>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      <style jsx global>{`
-        input, button {
-          border-radius: 10px;
-          border: 1px solid rgba(255,255,255,0.16);
-          padding: 10px 12px;
-          background: rgba(255,255,255,0.04);
-          color: inherit;
-          outline: none;
-        }
-        button {
-          cursor: pointer;
-          background: rgba(255,255,255,0.08);
-          font-weight: 600;
-        }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
-        a { color: inherit; }
-      `}</style>
+          <form onSubmit={createInvoice} className="mt-5 grid gap-4 md:grid-cols-2">
+            <label className="grid gap-2">
+              <span className="text-sm text-white/70">Customer name</span>
+              <input
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                required
+                className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                placeholder="e.g. Acme Co."
+              />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-sm text-white/70">Customer email (optional)</span>
+              <input
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                placeholder="billing@acme.com"
+              />
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-sm text-white/70">Amount (USDC)</span>
+              <input
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                inputMode="decimal"
+                placeholder="e.g. 149.99"
+                required
+                className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+              />
+              <span className="text-xs text-white/45">We treat USDC ≈ USD for now (perfect for MVP).</span>
+            </label>
+
+            <label className="grid gap-2">
+              <span className="text-sm text-white/70">Memo (optional)</span>
+              <input
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none placeholder:text-white/30"
+                placeholder="e.g. January retainer"
+              />
+            </label>
+
+            <div className="md:col-span-2 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="min-h-[20px] text-sm">
+                {err ? <span className="text-rose-300">{err}</span> : toast ? <span className="text-emerald-200">{toast}</span> : null}
+              </div>
+
+              <button
+                type="submit"
+                disabled={creating}
+                className="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 font-semibold text-black hover:opacity-90 disabled:opacity-60"
+              >
+                {creating ? "Creating…" : "Create invoice"}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* List */}
+        <section className="mt-8">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold">Invoices</h2>
+            <button
+              onClick={refresh}
+              disabled={loading}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10 disabled:opacity-60"
+            >
+              {loading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
+
+          <div className="mt-4 grid gap-3">
+            {invoices.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/70">
+                No invoices yet. Create one above to generate a payment link.
+              </div>
+            ) : (
+              invoices.map((inv) => {
+                const amt = normalizeAmountUSD(inv);
+                const pill = statusPill(inv.status);
+                const link = typeof window !== "undefined" ? `${window.location.origin}/i/${inv.token}` : `/i/${inv.token}`;
+                const stable = (inv.currency || currency || "USDC").toUpperCase();
+                const net = (inv.chain || chain || "Base").toString();
+
+                return (
+                  <div key={inv.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs ${pill.cls}`}>
+                            {pill.label}
+                          </span>
+                          <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/70">
+                            {stable}
+                          </span>
+                          <span className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/70">
+                            {net}
+                          </span>
+                        </div>
+
+                        <div className="mt-2 truncate text-lg font-semibold">{inv.customerName || "Unnamed customer"}</div>
+                        <div className="mt-1 text-sm text-white/60">
+                          {inv.customerEmail ? inv.customerEmail : "No email"} • {inv.memo ? inv.memo : "No memo"}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 md:items-end">
+                        <div className="text-right">
+                          <div className="text-xs text-white/60">Amount</div>
+                          <div className="text-xl font-semibold">
+                            {fmtUSDC(amt)} <span className="text-sm font-normal text-white/70">{stable}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 md:justify-end">
+                          <a
+                            href={`/i/${inv.token}`}
+                            className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
+                          >
+                            Open checkout
+                          </a>
+                          <button
+                            onClick={() => copy(link)}
+                            className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm hover:bg-white/10"
+                          >
+                            Copy link
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex flex-col gap-1 text-xs text-white/50 md:flex-row md:items-center md:justify-between">
+                      <div>Created: {fmtDate(inv.createdAt)}</div>
+                      <div className="truncate">Token: {inv.token}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
