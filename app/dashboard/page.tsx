@@ -15,9 +15,8 @@ function normalizeAmount(inv: any): number {
 
 
 import { safeJson } from "../lib/safeJson";
-import { moneyUSD } from "../lib/money";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 type Invoice = {
   id: string;
@@ -71,7 +70,7 @@ export default function DashboardPage() {
       .reduce((sum, i) => sum + normalizeAmount(i), 0);
   }, [invoices]);
 
-  async function createInvoice(e: React.FormEvent) {
+  async function createInvoice(e: FormEvent) {
     e.preventDefault();
     setCreating(true);
     setErr(null);
@@ -169,7 +168,6 @@ export default function DashboardPage() {
                 <div style={{ fontWeight: 600 }}>{inv.customerName}</div>
                 {inv.customerEmail ? <div style={{ opacity: 0.75, fontSize: 13 }}>{inv.customerEmail}</div> : null}
               </div>
-              <div style={{ fontWeight: 700 }}>{moneyUSD(normalizeAmount(inv))}</div>
               <div>
                 <a href={`/i/${inv.token}`} target="_blank" rel="noreferrer">Open</a>
               </div>
