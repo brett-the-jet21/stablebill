@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { getPrisma } from "../../../../lib/prisma";
 import { getStripe } from "../../../lib/stripe";
-import { prisma } from "../../../lib/prisma";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   // Guard: Stripe env not configured
@@ -11,19 +14,30 @@ export async function POST(req: Request) {
     );
   }
 
-  // Guard: DB not configured (prisma stub or not wired yet)
-  if (!prisma || !(prisma as any).invoice) {
+  // ✅ Lazy-init Prisma INSIDE handler (no build-time Prisma require)
+  let prisma: any;
+  try {
+    prisma = await getPrisma();
+  } catch (e: any) {
     return NextResponse.json(
       { error: "Database not configured (Prisma not initialized)" },
       { status: 503 }
     );
   }
 
-  const body = await req.json();
-  const token = String(body.token || "").trim();
+  // Guard: DB model not present
+  if (!prisma?.invoice) {
+    return NextResponse.json(
+      { error: "Database not configured (invoice model missing)" },
+      { status: 503 }
+    );
+  }
+
+  const body = await req.json().catch(() => ({} as any));
+  const token = String((body as any).token || "").trim();
   if (!token) return NextResponse.json({ error: "token required" }, { status: 400 });
 
-  const invoice = await (prisma as any).invoice.findUnique({ where: { token } });
+  const invoice = await prisma.invoice.findUnique({ where: { token } });
   if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
   if (invoice.status === "PAID") return NextResponse.json({ error: "Already paid" }, { status: 400 });
 
