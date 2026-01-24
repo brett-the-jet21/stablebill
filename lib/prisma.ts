@@ -1,5 +1,18 @@
-/**
- * TEMP SAFE STUB so builds pass before DB is wired.
- * Replace with real PrismaClient later.
- */
-export const prisma: any = null;
+import { PrismaClient } from "@prisma/client";
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __prisma: PrismaClient | undefined | null;
+}
+
+const cached = globalThis.__prisma ?? undefined;
+
+export const prisma =
+  cached ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalThis.__prisma = prisma;
+}

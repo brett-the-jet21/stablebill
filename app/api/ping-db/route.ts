@@ -6,7 +6,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // cheap query that proves Prisma works in a route handler
     const count = await prisma.invoice.count();
     return NextResponse.json({ ok: true, invoiceCount: count });
   } catch (err: any) {

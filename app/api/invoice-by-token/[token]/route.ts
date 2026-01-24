@@ -12,7 +12,7 @@ export async function GET(
     const token = params.token;
 
     const invoice = await prisma.invoice.findUnique({
-      where: { token }
+      where: { token },
     });
 
     if (!invoice) {
@@ -22,7 +22,6 @@ export async function GET(
     return NextResponse.json(invoice, { status: 200 });
   } catch (err: any) {
     console.error("invoice-by-token GET failed:", err);
-    // IMPORTANT: return JSON always, even on error
     return NextResponse.json(
       { error: "Server error", message: err?.message ?? String(err) },
       { status: 500 }
