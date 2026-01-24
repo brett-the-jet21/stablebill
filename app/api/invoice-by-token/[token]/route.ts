@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
-// Prisma must run on Node, not Edge:
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -11,10 +10,6 @@ export async function GET(
 ) {
   try {
     const token = params.token;
-
-    if (!token || typeof token !== "string") {
-      return NextResponse.json({ error: "Missing token" }, { status: 400 });
-    }
 
     const invoice = await prisma.invoice.findUnique({
       where: { token }
@@ -26,12 +21,10 @@ export async function GET(
 
     return NextResponse.json(invoice, { status: 200 });
   } catch (err: any) {
-    console.error("invoice-by-token GET failed", {
-      message: err?.message,
-      stack: err?.stack
-    });
+    console.error("invoice-by-token GET failed:", err);
+    // IMPORTANT: return JSON always, even on error
     return NextResponse.json(
-      { error: "Server error", message: err?.message ?? "unknown" },
+      { error: "Server error", message: err?.message ?? String(err) },
       { status: 500 }
     );
   }
