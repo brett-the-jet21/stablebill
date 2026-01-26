@@ -1,26 +1,23 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { getPrisma } from "../../../../lib/prisma";
+import { publicInvoice } from "../../../../lib/invoices";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __prismaClient: PrismaClient | undefined;
-}
-
-const prisma = globalThis.__prismaClient ?? new PrismaClient();
-if (process.env.NODE_ENV !== "production") globalThis.__prismaClient = prisma;
-
 export async function GET(_req: Request, { params }: { params: { token: string } }) {
   try {
-    const invoice = await prisma.invoice.findUnique({ where: { token: params.token } });
+    const prisma = await getPrisma();
+    const invoice = await prisma.invoice.findUnique({
+      where: { token: params.token },
+      include: { client: true },
+    });
     if (!invoice) return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
-    return NextResponse.json(invoice);
+    return NextResponse.json({ invoice: publicInvoice(invoice) });
   } catch (err: any) {
     return NextResponse.json(
       { error: "Server error", message: err?.message ?? String(err) },
-      { status: 500 }
+      { status: err?.message?.includes("DATABASE_URL") ? 503 : 500 }
     );
   }
 }

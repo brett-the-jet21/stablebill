@@ -47,8 +47,13 @@ export async function POST(req: Request) {
   const appUrl =
     process.env.NEXT_PUBLIC_APP_URL || req.headers.get("origin") || "http://localhost:3000";
 
+  const amountCents = Number(invoice.amountUsd ?? invoice.amountCents ?? 0);
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    return NextResponse.json({ error: "Invoice amount invalid" }, { status: 400 });
+  }
+
   // Coinbase Commerce expects amount as string in major units (USD here)
-  const amount = (invoice.amountCents / 100).toFixed(2);
+  const amount = (amountCents / 100).toFixed(2);
 
   const charge = await (Charge as any).create({
     name: `Stable Bill Invoice`,

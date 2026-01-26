@@ -42,6 +42,10 @@ export async function POST(req: Request) {
   if (invoice.status === "PAID") return NextResponse.json({ error: "Already paid" }, { status: 400 });
 
   const origin = req.headers.get("origin") || "http://localhost:3000";
+  const amountCents = Number(invoice.amountUsd ?? invoice.amountCents ?? 0);
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    return NextResponse.json({ error: "Invoice amount invalid" }, { status: 400 });
+  }
 
   const session = await getStripe().checkout.sessions.create({
     mode: "payment",
@@ -51,7 +55,7 @@ export async function POST(req: Request) {
         quantity: 1,
         price_data: {
           currency: "usd",
-          unit_amount: invoice.amountCents,
+          unit_amount: amountCents,
           product_data: {
             name: `Invoice ${invoice.id}`,
             description: invoice.memo || "Stable Bill invoice",
