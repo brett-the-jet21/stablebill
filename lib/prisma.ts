@@ -16,3 +16,10 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") {
   globalThis.__prisma = prisma;
 }
+
+export async function getPrisma() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("Missing DATABASE_URL");
+  }
+  return prisma;
+}
