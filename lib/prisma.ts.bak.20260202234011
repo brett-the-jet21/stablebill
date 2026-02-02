@@ -1,0 +1,25 @@
+let prismaSingleton: any = null;
+
+export async function getPrisma() {
+  if (prismaSingleton) return prismaSingleton;
+
+  const PrismaMod: any = await import("@prisma/client");
+  const PrismaClientCtor =
+    PrismaMod?.PrismaClient ||
+    PrismaMod?.default?.PrismaClient ||
+    PrismaMod?.default;
+
+  if (!PrismaClientCtor) {
+    throw new Error("PrismaClient not found in @prisma/client. Did prisma generate run?");
+  }
+
+  const g: any = globalThis as any;
+  if (process.env.NODE_ENV !== "production") {
+    if (!g.__stablebill_prisma__) g.__stablebill_prisma__ = new PrismaClientCtor();
+    prismaSingleton = g.__stablebill_prisma__;
+    return prismaSingleton;
+  }
+
+  prismaSingleton = new PrismaClientCtor();
+  return prismaSingleton;
+}
