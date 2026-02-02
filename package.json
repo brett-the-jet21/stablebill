@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "PRISMA_CLIENT_ENGINE_TYPE=binary PRISMA_CLI_QUERY_ENGINE_TYPE=binary prisma generate && next build",
     "start": "next start",
-    "postinstall": "prisma generate"
+    "postinstall": "PRISMA_CLIENT_ENGINE_TYPE=binary PRISMA_CLI_QUERY_ENGINE_TYPE=binary prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.3.0",
